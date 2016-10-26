@@ -9,7 +9,6 @@ PuzzleGenerator::PuzzleGenerator(int _nRows, int _nColumns, int _minVal, int _ma
 
 Puzzle PuzzleGenerator::GeneratePuzzle()
 {
-  cout << "here" << endl;
   timer.StartTimer();
   maxtime = 59.9;	// To make sure we don't exceed a minute
 
@@ -17,16 +16,12 @@ Puzzle PuzzleGenerator::GeneratePuzzle()
 
   // We could also do as many random walks as we can within the given time limit.
 
-  Puzzle best(nRows, nColumns, minVal, maxVal);
+  // while(timer.GetElapsedTime() < maxtime - 0.1) {
+  // }
 
-  while(timer.GetElapsedTime() < maxtime - 0.1) {
-    Puzzle nextPuzzle = best.GetRandomSuccessor();
-    cout << "PUZZLE: " << next.GetValue() << endl;
-    cout << "SOLUTION?: " << next.HasSolution() << endl;
-    if(next.HasSolution() && next.GetValue() > best.GetValue()) {
-      best = next;
-    }
-  }
+  Puzzle best = SimulatedAnnealing(maxtime);
+
+  return best;
 
   // max solution
   /*Puzzle best = RandomWalk(5);
@@ -41,7 +36,6 @@ Puzzle PuzzleGenerator::GeneratePuzzle()
     }
   }*/
 
-  return best;
 }
 
 Puzzle PuzzleGenerator::RandomWalk(double timelimit)
@@ -81,4 +75,30 @@ Puzzle PuzzleGenerator::RandomWalk(double timelimit)
 	// The following code is not executed in this function. It exists just as an example for getting all the successors of a puzzle.
 	vector<Puzzle> successors;
 	bestPuzzle.GetAllSuccessors(successors);
+}
+
+Puzzle PuzzleGenerator::SimulatedAnnealing(double inputTime)
+{
+  Puzzle best(nRows, nColumns, minVal, maxVal);
+  Puzzle current = best;
+
+  while(timer.GetElapsedTime() < inputTime) {
+    Puzzle next = current.GetRandomSuccessor();
+    int delta = next.GetValue() - current.GetValue();
+
+    // cout << "PUZZLE: " << next.GetValue() << endl;
+    // cout << "SOLUTION?: " << next.HasSolution() << endl;
+
+    double T = 1 - (timer.GetElapsedTime() / inputTime);
+    double r = ((double) rand() / (RAND_MAX));
+
+    if(delta > 0 || exp(delta / T) > r) {
+      current = next;
+      if(current.HasSolution() && current.GetValue() > best.GetValue()) {
+        best = current;
+      }
+    }
+  }
+
+  return best;
 }

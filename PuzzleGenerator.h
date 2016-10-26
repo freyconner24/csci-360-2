@@ -7,9 +7,10 @@
 class PuzzleGenerator{
 public:
 	PuzzleGenerator(int nRows, int nColumns, int minVal, int maxVal);
-	Puzzle GeneratePuzzle(); 
+	Puzzle GeneratePuzzle();
+	Puzzle SimulatedAnnealing(double inputTime);
 	Puzzle RandomWalk(double timelimit);	// Time limit given in seconds.
-	
+
 private:
 	int nRows, nColumns, minVal, maxVal;
 	Timer timer;
